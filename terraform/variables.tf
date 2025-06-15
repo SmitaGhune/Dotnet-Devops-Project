@@ -7,7 +7,7 @@ variable "location" {
 }
 
 variable "acr_name" {
-  default = "dotnetacr1234"
+  default = "dotnetacr123"
 }
 
 variable "aks_name" {

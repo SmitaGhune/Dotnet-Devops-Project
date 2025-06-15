@@ -1,0 +1,9 @@
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
+.terraform/
+crash.log
+
+# Terraform variable files you don't want to expose
+*.tfvars
+*.tfvars.json

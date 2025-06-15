@@ -1,5 +1,6 @@
 provider "azurerm" {
   features {}
+  subscription_id = "1411a036-a526-4973-8426-f985e176b945"
 }
 
 resource "azurerm_resource_group" "rg" {
@@ -24,7 +25,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
   default_node_pool {
     name       = "default"
     node_count = 1
-    vm_size    = "Standard_DS2_v2"
+    vm_size    = "Standard_B2s"
   }
 
   identity {
@@ -32,4 +33,13 @@ resource "azurerm_kubernetes_cluster" "aks" {
   }
 
   depends_on = [azurerm_container_registry.acr]
+}
+
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "dotnetapp-rg"
+    storage_account_name = "dotnetstoragest123"  # ✅ Your actual storage account
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
 }

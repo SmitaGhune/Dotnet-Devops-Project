@@ -1,0 +1,59 @@
+name: Build and Deploy .NET App to AKS
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to main branch
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout source code
+      uses: actions/checkout@v3
+
+    - name: Azure Login using OIDC
+      uses: azure/login@v1
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+    - name: Set up .NET
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: '8.0.x'  # or your version
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Build the app
+      run: dotnet build --configuration Release
+
+    - name: Publish the app
+      run: dotnet publish -c Release -o publish
+
+    - name: Build Docker image
+      run: |
+        docker build -t dotnetacr123.azurecr.io/dotnetapp:${{ github.sha }} .
+
+    - name: Push image to ACR
+      run: |
+        az acr login --name dotnetacr123
+        docker push dotnetacr123.azurecr.io/dotnetapp:${{ github.sha }}
+
+    - name: Set Kubernetes context
+      uses: azure/aks-set-context@v3
+      with:
+        resource-group: dotnetapp-rg
+        cluster-name: dotnet-aks-cluster
+
+    - name: Deploy to AKS using kubectl
+      run: |
+        kubectl apply -f k8s/deployment.yaml
+        kubectl apply -f k8s/service.yaml

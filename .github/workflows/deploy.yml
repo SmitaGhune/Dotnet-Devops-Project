@@ -30,13 +30,13 @@ jobs:
         dotnet-version: '8.0.x'  # or your version
 
     - name: Restore dependencies
-      run: dotnet restore ./src/YourApp.csproj
+      run: dotnet restore ./src/DotNetApp/DotNetApp.csproj
 
-    - name: Build the app
-      run: dotnet build --configuration Release
+    - name: Build
+      run: dotnet build ./src/DotNetApp/DotNetApp.csproj --configuration Release
 
-    - name: Publish the app
-      run: dotnet publish -c Release -o publish
+    - name: Publish
+      run: dotnet publish ./src/DotNetApp/DotNetApp.csproj -c Release -o ./publish
 
     - name: Build Docker image
       run: |

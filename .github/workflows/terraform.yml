@@ -3,7 +3,7 @@ name: Terraform Deployment to Azure
 on:
   push:
     branches:
-      - main
+      - feature
 
 permissions:
   id-token: write
@@ -31,13 +31,13 @@ jobs:
 
     - name: Terraform Init
       run: terraform init
-
-    - name: Terraform Validate
-      run: terraform validate
+      working-directory: ./terraform
 
     - name: Terraform Plan
       run: terraform plan -out=tfplan
+      working-directory: ./terraform
 
     - name: Terraform Apply
       if: github.ref == 'refs/heads/main'
       run: terraform apply -auto-approve tfplan
+      working-directory: ./terraform

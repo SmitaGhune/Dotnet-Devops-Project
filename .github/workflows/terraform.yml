@@ -2,8 +2,8 @@ name: Terraform Deployment to Azure
 
 on:
   push:
-    branches:
-      - feature
+    paths:
+      - 'terraform/**'
 
 permissions:
   id-token: write

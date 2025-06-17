@@ -1,8 +1,15 @@
 provider "azurerm" {
   features {}
-  subscription_id = "1411a036-a526-4973-8426-f985e176b945"
+  #subscription_id = "1411a036-a526-4973-8426-f985e176b945"
 }
-
+terraform {
+  backend "azurerm" {
+    resource_group_name  = "dotnetapp-rg"
+    storage_account_name = "dotnetstoragest123"  # ✅ Your actual storage account
+    container_name       = "tfstate"
+    key                  = "terraform.tfstate"
+  }
+}
 resource "azurerm_resource_group" "rg" {
   name     = var.resource_group_name
   location = var.location
@@ -35,11 +42,12 @@ resource "azurerm_kubernetes_cluster" "aks" {
   depends_on = [azurerm_container_registry.acr]
 }
 
-terraform {
-  backend "azurerm" {
-    resource_group_name  = "dotnetapp-rg"
-    storage_account_name = "dotnetstoragest123"  # ✅ Your actual storage account
-    container_name       = "tfstate"
-    key                  = "terraform.tfstate"
-  }
+# OPTIONAL BUT RECOMMENDED:
+# Allow AKS to pull from ACR
+resource "azurerm_role_assignment" "aks_acr_pull" {
+  principal_id         = azurerm_kubernetes_cluster.aks.kubelet_identity[0].object_id
+  role_definition_name = "AcrPull"
+  scope                = azurerm_container_registry.acr.id
+
+  depends_on = [azurerm_kubernetes_cluster.aks]
 }

@@ -27,5 +27,5 @@ variable "acr_name" {
 variable "aks_name" {
   description = "Name of the Azure Kubernetes Service cluster"
   type        = string
-  default     = "dotnet-aks-cluster"
+  default     = "my-aks-cluster"
 }
